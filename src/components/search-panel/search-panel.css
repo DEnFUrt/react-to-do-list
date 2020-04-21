@@ -1,0 +1,17 @@
+.search-panel {
+  margin: 1rem 0;
+}
+
+.search-panel .search-input {
+  width: auto;
+  flex-grow: 1;
+}
+
+.btn-custom {
+  margin-right: 3px;
+  cursor: pointer;
+}
+
+.btn-custom:hover {
+  background-color: rgba(116, 147, 175, 0.466);
+}
