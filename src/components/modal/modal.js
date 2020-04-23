@@ -57,7 +57,7 @@ export default class Modal extends Component {
 
   render() {
     const {value} = this.state;
-    const {cancelTitle = 'Отмена', actionTitle = 'Сохранить'} = this.props;
+    const {cancelTitle = 'Отмена', actionTitle = 'Сохранить', onClose} = this.props;
     const {modalClass, modalStyles, title} = this.createModal();
 
     return ReactDOM.createPortal(
@@ -87,7 +87,7 @@ export default class Modal extends Component {
                 type = "button"
                 className = "btn btn-default"
                 data-dismiss = "modal"
-                onClick = {this.props.onClose}
+                onClick = {() => onClose(false)}
                 >
                   {cancelTitle}
                 </button>

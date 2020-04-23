@@ -30,7 +30,7 @@ export default class App extends Component {
     this.onUpdateSearch = this.onUpdateSearch.bind(this);
     this.onFilterSelect = this.onFilterSelect.bind(this);
     this.editItem = this.editItem.bind(this);
-    this.onCloseModal = this.onCloseModal.bind(this);
+    this.onCloseModal = this.onToggleModal.bind(this);
     this.onOpenModal = this.onOpenModal.bind(this);
   }
   
@@ -199,19 +199,13 @@ export default class App extends Component {
     this.tempLabel = oldItem.label;
     this.tempId = id;
     console.log('oldLabel: ', this.tempLabel);
-    this.setState(({isModal}) => {
-      if (!isModal) {
-        return {isModal : true}
-      }
-    })
+    this.onToggleModal(true);
   }
 
-  onCloseModal() {
-    this.setState(({isModal}) => {
-      if (isModal) {
-        return {isModal : false}
-      }
-    })
+  onToggleModal(flag) {
+    this.setState(
+      ({isModal}) => isModal !== flag ? {isModal : flag} : null      
+    )
   }
 
   onToggleImportant(id) {
@@ -319,7 +313,7 @@ export default class App extends Component {
             isTitle = {this.state.titleModal}
             isValue = {this.tempLabel}
             isId = {this.tempId}
-            onClose = {this.onCloseModal}
+            onClose = {this.onToggleModal}
             onAction = {this.editItem}
           >
           </Modal>
