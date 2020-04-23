@@ -16,7 +16,7 @@ export default class Modal extends Component {
   }
 
   createModal() {
-    const {isModal, isTitle = ''} = this.props;
+    const {onClose, isModal, isTitle = ''} = this.props;
     const modalClass = isModal ? "modal fade show" : "modal fade";
     const modalStyles = isModal ? {display: "block"} : {};
     const title = isTitle ? (
@@ -26,7 +26,7 @@ export default class Modal extends Component {
           type="button" 
           className="close" 
           data-dismiss="modal"
-          onClick = {this.props.onClose}
+          onClick = {() => onClose(false)}
           aria-hidden="true">
           <span aria-hidden="true">&times;</span>
           </button>
@@ -43,7 +43,7 @@ export default class Modal extends Component {
     document.body.classList.add('modal-open');
     this.elemModal.className = 'overlay';
     this.elemModal.style.display = 'block';
-    document.body.appendChild(this.elemModal);
+    document.body.append(this.elemModal);
     this.setState({
       value : this.props.isValue || '',
       id : this.props.isId || ''
@@ -52,21 +52,19 @@ export default class Modal extends Component {
 
   componentWillUnmount() {
     document.body.classList.remove('modal-open');
-    document.body.removeChild(this.elemModal);
+    this.elemModal.remove();
   }
 
   render() {
     const {value} = this.state;
-    const {cancelTitle = 'Отмена', actionTitle = 'Сохранить', onClose} = this.props;
+    const {cancelTitle = 'Отмена', actionTitle = 'Сохранить', onClose, onAction} = this.props;
     const {modalClass, modalStyles, title} = this.createModal();
 
     return ReactDOM.createPortal(
-      // <div className = "modal">
       <div 
         className = {modalClass}
         style = {modalStyles}
         data-backdrop="static"
-        
       >
         <div className = "modal-dialog modal-lg modal-dialog-centered">
           <div className = "modal-content">
@@ -94,21 +92,13 @@ export default class Modal extends Component {
               <button
                 type = "button"
                 className = "btn btn-primary"
-                onClick = {() => this.props.onAction(this.state)}
+                onClick = {() => onAction(this.state)}
                 >
                   {actionTitle}
                 </button>
             </div>
           </div>
         </div>
-{/* </div> */}
-        {/* <button
-          className = "modal_close-button"
-          onClick = {this.props.onClose}
-        >
-          Закрыть
-        </button> */}
-        {this.props.children}
       </div>,
       this.elemModal
     );

@@ -30,7 +30,7 @@ export default class App extends Component {
     this.onUpdateSearch = this.onUpdateSearch.bind(this);
     this.onFilterSelect = this.onFilterSelect.bind(this);
     this.editItem = this.editItem.bind(this);
-    this.onCloseModal = this.onToggleModal.bind(this);
+    this.onToggleModal = this.onToggleModal.bind(this);
     this.onOpenModal = this.onOpenModal.bind(this);
   }
   
@@ -118,19 +118,11 @@ export default class App extends Component {
     }
   }
 
-  /* Вариант с промежуточной переменной index (индекс элемента в стейте)
-  deleteItem(id) {
-    this.setState(({data}) => {
-      const index = data.findIndex(elem => elem.id === id);
-      const newData = [...data.slice(0, index), ...data.slice(index + 1)];
-      return {data : newData}
-    });
-  } */
-
   deleteItem(id) {
     const {data} = this.state;
     const newData = data.filter(item => item.id !== id);
-    this.putFetchData(newData);
+    
+    //this.putFetchData(newData);
   }
 
   addItem(value) {
@@ -143,27 +135,12 @@ export default class App extends Component {
     }
     const {data} = this.state;
     const newData = [...data, newItem];
+    
     //this.putFetchData(newData);
   }
     
-/* Вариант с промежуточной переменной 
-  addItem(value) {
-    const newItem = {
-      label : value,
-      important : false,
-      like : false,
-      id : Date.now() + Math.random(0.5), 
-    }
-  this.setState(({data}) => {
-      const newData = [...data, newItem];
-      
-      return {data : newData}
-    });
-  }
- */
-
   editItem({id, value}) {
-    this.onCloseModal();
+    this.onToggleModal(false);
     const {data} = this.state;
     const index = data.findIndex(item => item.id === id);
     const oldItem = data[index];
@@ -179,19 +156,6 @@ export default class App extends Component {
       //this.putFetchData(newData);
     }
   }
-
-/* Вариант с промежуточной переменной index(индекс элемента в стейте), промежуточными переменными 
-  для изменения элемента в стейте и нового стейта.
-  onToggleImportant(id) {
-    this.setState(({data}) => {
-      const index = data.findIndex(elem => elem.id === id);
-      const oldItem = data[index];
-      const newItem = {...oldItem, important: !oldItem.important};
-      const newData = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
-      
-      return {data: newData}
-    });
-  } */
 
   onOpenModal(id) {
     const {data} = this.state;
@@ -215,6 +179,7 @@ export default class App extends Component {
       );
     
     //this.putFetchData(newData);
+    
     /* this.setState(({data}) => {
       return {
         data : data.map(
@@ -224,20 +189,26 @@ export default class App extends Component {
     }); */
   }
 
-  onToggleLiked(id) {
-  const {data} = this.state;
-  const newData = data.map(
-    item => item.id === id ? {...item, like: !item.like} : item
-  );
+  /* Вариант с промежуточной переменной index(индекс элемента в стейте), промежуточными переменными 
+  для изменения элемента в стейте и нового стейта.
+  onToggleImportant(id) {
+    this.setState(({data}) => {
+      const index = data.findIndex(elem => elem.id === id);
+      const oldItem = data[index];
+      const newItem = {...oldItem, important: !oldItem.important};
+      const newData = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
+      
+      //this.putFetchData(newData);
+    });
+  } */
 
-  //this.putFetchData(newData);
-    /* this.setState(({data}) => {
-      return {
-        data : data.map(
-          item => item.id === id ? {...item, like: !item.like} : item
-        )
-      }
-    }); */
+  onToggleLiked(id) {
+    const {data} = this.state;
+    const newData = data.map(
+      item => item.id === id ? {...item, like: !item.like} : item
+    );
+
+    //this.putFetchData(newData);
   }
 
   countLiked({data}) {
