@@ -5,7 +5,7 @@ import './post-list-item.css';
 export default class PostListItem extends Component {
 
   setClasses() {
-    const {important, like} = this.props;
+    const {important, like, edit} = this.props;
     let classNames = 'app-list-item row justify-content-between';
 
     if (important) {
@@ -14,6 +14,10 @@ export default class PostListItem extends Component {
 
     if (like) {
       classNames += ' like';
+    }
+
+    if (edit) {
+      classNames += ' edit';
     }
 
     return classNames;
@@ -34,8 +38,11 @@ export default class PostListItem extends Component {
           onClick = {onEditLabel}
         >
           {label}
+          <i
+            className = "fa fa-pencil"
+          ></i>
         </span>
-        <div className = "col-2 d-flex justify-content-center align-items-center">
+        <div className = "col-2 d-flex justify-content-center align-items-center"> 
           <button 
             type = "button"
             className = "btn-star btn-sm"

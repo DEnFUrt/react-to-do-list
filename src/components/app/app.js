@@ -5,22 +5,29 @@ import PostStatusFilter from '../post-status-filter';
 import PostList from '../post-list';
 import PostAddForm from '../post-add-form';
 import Modal from '../modal';
+import CheckData from '../check-data';
+import FetchData from '../fetch-data';
 
 import './app.css';
 
 export default class App extends Component {
-  listKeyObj = ['label', 'important', 'like', 'dateStamp'];
+  listKeyObj = ['label', 'important', 'like', 'dateStamp', 'edit'];
+  titleModal = {
+    edit : 'Редактировать запись',
+    add : 'Добавить запись',
+  };
   tempLabel = '';
   tempId = '';
 
   constructor(props) {
     super(props);
     this.state = {
+      userID : '',
       data : [],
       term : '',
       filter : 'all',
       isModal : false,
-      titleModal : 'Редактировать запись',
+      
     }
 
     this.deleteItem = this.deleteItem.bind(this);
@@ -32,39 +39,16 @@ export default class App extends Component {
     this.editItem = this.editItem.bind(this);
     this.onToggleModal = this.onToggleModal.bind(this);
     this.onOpenModal = this.onOpenModal.bind(this);
+    this.onChangeUser = this.onChangeUser.bind(this);
   }
   
-  checkObj(obj) {
-    let result = true;
-    const listKeys = Object.keys(obj);
-
-    this.listKeyObj.forEach(key => {
-      if (!listKeys.includes(key)) {
-        result = false;
-      }
-    });
-
-    return result;
-  }
-
-  clearData(dirtyData) {
-    const cleanData = dirtyData.filter(item => {
-      let result = false;
-
-      if (typeof item === 'object' &&
-        this.checkObj(item)) {
-        result = true;
-      }
-      return result;
-    });
-
+  addId(cleanData) {
     cleanData.forEach(item => {
       if (item.id === undefined) {
         item.id = Date.now() + Math.random(0.5)
       }
     });
-
-    this.setState(({data}) => ({data : cleanData}));
+    return cleanData;
   }
   
   setDateStapm() {
@@ -83,21 +67,57 @@ export default class App extends Component {
     return `${addZero(dateStamp.getDate())}.${addZero(dateStamp.getMonth() + 1)}.${dateStamp.getFullYear()} ${addZero(dateStamp.getHours())}:${addZero(dateStamp.getMinutes())}`;
   }
 
-  async getFetchData() {
+  /* async getFetchData(userID) { можно убрать когда все проверю
     try {
-      //let response = await fetch('https://api.jsonbin.io/b/5e95fa4f435f5604bb41556e/latest');
+      // let response = await fetch('https://api.jsonbin.io/b/5e95fa4f435f5604bb41556e/latest');
       let response = await fetch('https://my-json-server.typicode.com/DEnFUrt/json-repo/dirtyData');
       let result = await response.json();
       console.log('dirtyData: ', result);
       console.log('!!!!START GET FETCH!!!!')
-      // this.clearData(result.dirtyData);
-      this.clearData(result);
+      // const cleanData = new CheckData(this.listKeyObj).clearData(result.dirtyData);
+      const cleanData = new CheckData(this.listKeyObj).clearData(result);
+      const fullData = this.addId(cleanData);
+      console.log('fullData: ', fullData);
+      this.setState(({data}) => ({data : fullData}));
     } catch(error) {
       console.log(error.message);
     }
+  } */
+
+  onGetData(userID) {
+    const getData = new FetchData({userID, type: /* 'getData' */ 'getDataTest'});
+    getData.getFetchData()
+      .then(
+        result => {
+          const cleanData = new CheckData(this.listKeyObj).clearData(result/* .dirtyData */);
+          const fullData = this.addId(cleanData);
+          console.log('fullData: ', fullData);
+          this.setState(({data}) => ({data : fullData}));
+        }
+      )
+      .catch(
+        error => alert(`Ошибка получения данных - ${error.message}`)
+      )
   }
 
-  async putFetchData(data) {
+  onPutData(userID, data) {
+    const putData = new FetchData({userID, type: 'putData' /* 'getDataTest' */});
+    putData.putFetchData(data)
+      .then(
+        result => {
+          console.log('Результат отправки данных на сервер: ', result);
+        }
+      )
+      .catch(
+        error => alert(`Ошибка обновления данных - ${error.message}`)
+      )
+      .finally(
+        () => this.onGetData(userID)
+      )
+  }
+
+  /* async putFetchData(data) {
+    return
     const putData = {dirtyData : data};
     console.log('!!!!START PUT FETCH!!!!')
     try {
@@ -116,13 +136,13 @@ export default class App extends Component {
     finally {
       this.getFetchData();
     }
-  }
+  } */
 
   deleteItem(id) {
-    const {data} = this.state;
+    const {data, userID} = this.state;
     const newData = data.filter(item => item.id !== id);
     
-    //this.putFetchData(newData);
+    this.onPutData(userID, newData);
   }
 
   addItem(value) {
@@ -130,30 +150,32 @@ export default class App extends Component {
       label : value,
       important : false,
       like : false,
+      edit : false,
       id : Date.now() + Math.random(0.5),
       dateStamp : this.setDateStapm(),
     }
-    const {data} = this.state;
+    const {data, userID} = this.state;
     const newData = [...data, newItem];
     
-    //this.putFetchData(newData);
+    this.onPutData(userID, newData);
   }
     
   editItem({id, value}) {
     this.onToggleModal(false);
-    const {data} = this.state;
+    const {data, userID} = this.state;
     const index = data.findIndex(item => item.id === id);
     const oldItem = data[index];
     //const newLabel = prompt('Edit label', oldItem.label) || oldItem.label;
     const newLabel = value || oldItem.label;
     console.log('newLabel: ', newLabel);
+        
     if (newLabel.trim().length > 4 && newLabel !== oldItem.label) {
-      const newItem = {...oldItem, label: newLabel};
+      const newItem = {...oldItem, label: newLabel, edit: true};
       console.log('newItem: ', newItem);
       const newData = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
       console.log('newData: ', newData);
 
-      //this.putFetchData(newData);
+      this.onPutData(userID, newData);
     }
   }
 
@@ -173,12 +195,12 @@ export default class App extends Component {
   }
 
   onToggleImportant(id) {
-    const {data} = this.state;
+    const {data, userID} = this.state;
     const newData = data.map(
       item => item.id === id ? {...item, important: !item.important} : item
       );
     
-    //this.putFetchData(newData);
+      this.onPutData(userID, newData);
     
     /* this.setState(({data}) => {
       return {
@@ -203,12 +225,12 @@ export default class App extends Component {
   } */
 
   onToggleLiked(id) {
-    const {data} = this.state;
+    const {data, userID} = this.state;
     const newData = data.map(
       item => item.id === id ? {...item, like: !item.like} : item
     );
 
-    //this.putFetchData(newData);
+    this.onPutData(userID, newData);
   }
 
   countLiked({data}) {
@@ -245,8 +267,21 @@ export default class App extends Component {
     this.setState({filter});
   }
 
+  onChangeUser(userID) {
+    this.setState(
+      state => state.userID !== userID ? {userID} : null
+    );
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.userID !== prevState.userID) {
+      console.log('Update State', this.state)
+      this.onGetData(this.state.userID);
+    } else {console.log('NULL')}
+  }
+
   componentDidMount() {
-    this.getFetchData();
+    //this.getFetchData();
   }
 
   render() {
@@ -254,7 +289,8 @@ export default class App extends Component {
 
     return ( 
       <div className = "app container-fluid">
-        <AppHeader 
+        <AppHeader
+          onChangeUser = {this.onChangeUser} 
           liked = {this.countLiked(this.state)}
           allPosts = {this.countPosts(this.state)}
         />
@@ -281,7 +317,7 @@ export default class App extends Component {
         {this.state.isModal &&
           <Modal 
             isModal = {this.state.isModal}
-            isTitle = {this.state.titleModal}
+            isTitle = {this.titleModal.edit}
             isValue = {this.tempLabel}
             isId = {this.tempId}
             onClose = {this.onToggleModal}

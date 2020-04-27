@@ -10,9 +10,18 @@ export default class Modal extends Component {
       value : '',
       id : ''
     }
-    this.elemModal = document.createElement('div');
-    this.onValueChange = this.onValueChange.bind(this);
     
+    this.elemModal = document.createElement('div');
+    
+    this.onValueChange = this.onValueChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  onSubmit(e) {
+    e.preventDefault();
+    const {onAction} = this.props;
+    
+    onAction(this.state);
   }
 
   createModal() {
@@ -57,7 +66,7 @@ export default class Modal extends Component {
 
   render() {
     const {value} = this.state;
-    const {cancelTitle = 'Отмена', actionTitle = 'Сохранить', onClose, onAction} = this.props;
+    const {cancelTitle = 'Отмена', actionTitle = 'Сохранить', onClose} = this.props;
     const {modalClass, modalStyles, title} = this.createModal();
 
     return ReactDOM.createPortal(
@@ -72,12 +81,16 @@ export default class Modal extends Component {
             {title}
             {/* <!-- Основное содержимое модального окна --> */}
             <div className = "modal-body">
-            <input
-              type = "text"
-              className = "form-control"
-              onChange = {this.onValueChange}
-              value = {value}
-            />
+            <form
+              onSubmit = {this.onSubmit}
+            >
+              <input
+                type = "text"
+                className = "form-control"
+                onChange = {this.onValueChange}
+                value = {value}
+              />
+            </form>
             </div>
             {/* <!-- Футер модального окна --> */}
             <div className = "modal-footer">
@@ -92,7 +105,7 @@ export default class Modal extends Component {
               <button
                 type = "button"
                 className = "btn btn-primary"
-                onClick = {() => onAction(this.state)}
+                onClick = {this.onSubmit}
                 >
                   {actionTitle}
                 </button>

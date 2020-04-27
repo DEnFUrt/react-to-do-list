@@ -59,3 +59,14 @@
 .app-list-item.important .btn-star {
     color: #aeaeae;
 }
+
+.app-list-item .fa-pencil {
+  font-size: 10px;
+  margin-left: 10px;
+  color: dimgray;
+  visibility: hidden;
+}
+
+.app-list-item.edit .fa-pencil {
+  visibility: visible;
+}
