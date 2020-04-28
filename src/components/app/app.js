@@ -11,7 +11,8 @@ import FetchData from '../fetch-data';
 import './app.css';
 
 export default class App extends Component {
-  listKeyObj = ['label', 'important', 'like', 'dateStamp', 'edit'];
+  listKeyObjData = ['label', 'important', 'like', 'dateStamp', 'edit'];
+  listKeyObjUser = ['name', 'pass', /* 'userID' */];
   titleModal = {
     edit : 'Редактировать запись',
     add : 'Добавить запись',
@@ -27,7 +28,7 @@ export default class App extends Component {
       term : '',
       filter : 'all',
       isModal : false,
-      
+      listUsers : {},
     }
 
     this.deleteItem = this.deleteItem.bind(this);
@@ -40,6 +41,8 @@ export default class App extends Component {
     this.onToggleModal = this.onToggleModal.bind(this);
     this.onOpenModal = this.onOpenModal.bind(this);
     this.onChangeUser = this.onChangeUser.bind(this);
+    this.onAddUser = this.onAddUser.bind(this);
+    this.onDelUser = this.onDelUser.bind(this);
   }
   
   addId(cleanData) {
@@ -84,12 +87,27 @@ export default class App extends Component {
     }
   } */
 
+  onGetUsers() {
+    const getUsers = new FetchData({userID: '', type: 'getUserTest'});
+    getUsers.getFetchData()
+      .then(
+        result => {
+          const listUsers = new CheckData(this.listKeyObjUser).clearData(result);
+          console.log('listUsers: ', listUsers);
+          listUsers ? this.setState(state => state.listUsers = listUsers) : 
+            alert('Ошибка обработки списка пользователей');
+        })
+      .catch(
+        error => alert(`Ошибка получения списка пользователей - ${error.message}`)
+      )
+  }
+
   onGetData(userID) {
     const getData = new FetchData({userID, type: /* 'getData' */ 'getDataTest'});
     getData.getFetchData()
       .then(
         result => {
-          const cleanData = new CheckData(this.listKeyObj).clearData(result/* .dirtyData */);
+          const cleanData = new CheckData(this.listKeyObjData).clearData(result/* .dirtyData */);
           const fullData = this.addId(cleanData);
           console.log('fullData: ', fullData);
           this.setState(({data}) => ({data : fullData}));
@@ -116,6 +134,52 @@ export default class App extends Component {
       )
   }
 
+  onAddUser() {
+    //Получить имя юзера через модальное окно
+    //Создать под него пустутю date
+    //Получить обратно id date
+    //Создать запись в базе users 
+    //Обновить список users
+    //установить селект на нового юзера
+    const newUser = prompt('Введите имя пользователя', '');
+    if (newUser === null || newUser.length < 5) {
+      return
+    }
+    console.log('newUser: ', newUser);
+
+
+  }
+
+  onDelUser() {
+    
+    //Получить id юзера из state +
+    //Удалить запись из базы users +
+    //Удалить data по id юзера
+    //вернуть сообщение что юзер удален
+    console.log('del')
+    const {userID} = this.state;
+    if (!userID) {
+      return;
+    }
+    const delData = new FetchData({userID, type: /* 'delData' */ 'getDataTest'});
+    delData.delFetchData()
+      .then(
+        result => {
+          if (result.success) {
+            console.log('Результат отправки данных на сервер: ', result);
+
+          }
+        }
+      )
+      .catch(
+        error => alert(`Ошибка обновления данных - ${error.message}`)
+      )
+      .finally(
+        () => this.onGetData(userID)
+      )
+
+  }
+
   /* async putFetchData(data) {
     return
     const putData = {dirtyData : data};
@@ -137,6 +201,8 @@ export default class App extends Component {
       this.getFetchData();
     }
   } */
+
+  
 
   deleteItem(id) {
     const {data, userID} = this.state;
@@ -281,7 +347,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    //this.getFetchData();
+    this.onGetUsers();
   }
 
   render() {
@@ -290,7 +356,10 @@ export default class App extends Component {
     return ( 
       <div className = "app container-fluid">
         <AppHeader
-          onChangeUser = {this.onChangeUser} 
+          onChangeUser = {this.onChangeUser}
+          onAddUser = {this.onAddUser}
+          onDelUser = {this.onDelUser}
+          listUsers = {this.state.listUsers}
           liked = {this.countLiked(this.state)}
           allPosts = {this.countPosts(this.state)}
         />

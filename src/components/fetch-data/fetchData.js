@@ -42,7 +42,6 @@ export default class FetchData {
   }
 
   async getFetchData() {
-    //this._setPatch();
     console.log(this.patch);
     let result;
     try {
@@ -59,7 +58,6 @@ export default class FetchData {
 
   async putFetchData(data) {
     return
-    //this._setPatch();
     let result;
     const putData = {dirtyData : data};
     console.log('!!!!START PUT FETCH!!!!')
@@ -73,10 +71,24 @@ export default class FetchData {
         }
       });
       result = await response.json();
-      //console.log('Результат отправки данных на сервер: ', result);
     } catch(error) {
       console.error('Ошибка отправки данных на сервер: ', error.message);
     }
     return result;
   } 
+
+  async delFetchData() {
+    console.log('!!!!START DEL FETCH!!!!')
+    console.log(this.patch);
+    let result;
+    try {
+      let response = await fetch(this.patch, {
+        method: 'DELETE'
+      });
+      result = await response.json();
+    } catch(error) {
+      console.error('Ошибка удаления данных на сервере: ', error.message);
+    }
+    return result;
+  }
 }

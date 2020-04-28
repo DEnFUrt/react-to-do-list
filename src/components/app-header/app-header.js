@@ -1,16 +1,13 @@
 import React, {Component} from 'react';
-import CheckData from '../check-data';
-import FetchData from '../fetch-data';
 
 import './app-header.css';
 
 export default class AppHeader extends Component {
-  listKeyObj = ['name', 'pass', /* 'userID' */];
 
   constructor(props) {
     super(props);
     this.state = {
-      value : '',
+      //value : '',
       userID : '',
     }
 
@@ -20,20 +17,22 @@ export default class AppHeader extends Component {
 
   onSubmit(e) {
     e.preventDefault();
-    console.log(this.state.value)
   }
 
   onValueChange(e) {
     const select = e.target;
 
     this.setState({
-      value : select.value,
+      //value : select.value,
       userID : select[select.selectedIndex].value
     }, () => this.props.onChangeUser(this.state.userID));
   }
 
   addSelectOptions(listUsers) {
     const select =  document.getElementById('exampleSelect');
+    while (select.options.length > 1) {
+      select.options[select.options.length - 1].remove();
+    }
 
     listUsers.forEach(element => {  
       const newOption = new Option(element.name, element.userID);
@@ -41,27 +40,21 @@ export default class AppHeader extends Component {
     });
   }
 
-  onGetUsers() {
-    const getUsers = new FetchData({userID: '', type: 'getUserTest'});
-    getUsers.getFetchData()
-      .then(
-        result => {
-          const listUsers = new CheckData(this.listKeyObj).clearData(result);
-          console.log('listUsers: ', listUsers);
-          listUsers ? this.addSelectOptions(listUsers) : 
-            alert('Ошибка обработки списка пользователей');
-        })
-      .catch(
-        error => alert(`Ошибка получения списка пользователей - ${error.message}`)
-      )
+  componentDidUpdate(prevProps) {
+    if (this.props.listUsers !== prevProps.listUsers) {
+      this.addSelectOptions(this.props.listUsers);
+      console.log('this.props.listUsers: ', this.props.listUsers);
+    }
   }
 
   componentDidMount() {
-    this.onGetUsers();
+    //this.onGetUsers();
+    
   }
 
   render() {
-    const {liked, allPosts} = this.props;
+    const {liked, allPosts, onAddUser, onDelUser} = this.props;
+    //const {userID, value} = this.state;
     return (
       <div className = "app-header d-flex">
         <form
@@ -73,7 +66,7 @@ export default class AppHeader extends Component {
               <select
                 className = "custom-select mr-sm-2" 
                 id = "exampleSelect"
-              value = {this.state.value}
+                //value = {value}
                 onChange = {this.onValueChange}
               >
                 <option style = {{display: "none"}}></option>
@@ -81,8 +74,9 @@ export default class AppHeader extends Component {
             </div>
             <div className = "col-auto my-1">  
               <button
-                type = "submit"
+                type = "button"
                 className = "btn btn-outline-secondary"
+                onClick = {() => onAddUser()}
               >
                 Добавить
               </button>
@@ -91,6 +85,7 @@ export default class AppHeader extends Component {
               <button
                 type = "button"
                 className = "btn btn-outline-secondary"
+                onClick = {() => onDelUser()}
               >
                 Удалить
               </button>
