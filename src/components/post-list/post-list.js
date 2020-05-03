@@ -13,7 +13,7 @@ export default class PostList extends Component {
         <li key = {id} className = "list-group-item">
           <PostListItem 
             {...postProps}
-            onEditLabel = {() => onEditLabel(id)}
+            onEditLabel = {(e) => onEditLabel({e, id})}
             onDelete = {() => onDelete(id)}
             onToggleImportant = {() => onToggleImportant(id)}
             onToggleLiked = {() => onToggleLiked(id)}

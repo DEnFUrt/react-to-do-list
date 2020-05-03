@@ -19,18 +19,19 @@ export default class Modal extends Component {
 
   onSubmit(e) {
     e.preventDefault();
-    const {onAction} = this.props;
+    const {onAction} = this.props.propsModal;
     
     onAction(this.state);
   }
 
   createModal() {
-    const {onClose, isModal, isTitle = ''} = this.props;
+    const {isModal} = this.props;
+    const {modalTitle, onClose} = this.props.propsModal;
     const modalClass = isModal ? "modal fade show" : "modal fade";
     const modalStyles = isModal ? {display: "block"} : {};
-    const title = isTitle ? (
+    const title = modalTitle ? (
       <div className="modal-header">
-        <h5 className="modal-title">{isTitle}</h5>
+        <h5 className="modal-title">{modalTitle}</h5>
         <button 
           type="button" 
           className="close" 
@@ -53,9 +54,10 @@ export default class Modal extends Component {
     this.elemModal.className = 'overlay';
     this.elemModal.style.display = 'block';
     document.body.append(this.elemModal);
+    const {isValue = '', isId = ''} = this.props.propsModal;
     this.setState({
-      value : this.props.isValue || '',
-      id : this.props.isId || ''
+      value : isValue,
+      id : isId
     });
   }
 
@@ -66,7 +68,8 @@ export default class Modal extends Component {
 
   render() {
     const {value} = this.state;
-    const {cancelTitle = 'Отмена', actionTitle = 'Сохранить', onClose} = this.props;
+    const {isBody, isFooter, cancelTitle, actionTitle, onClose} = this.props.propsModal;
+    const {inputReadOnly, inputFocus} = this.props.propsModal;
     const {modalClass, modalStyles, title} = this.createModal();
 
     return ReactDOM.createPortal(
@@ -77,9 +80,9 @@ export default class Modal extends Component {
       >
         <div className = "modal-dialog modal-lg modal-dialog-centered">
           <div className = "modal-content">
-            {/* <!-- Заголовок модального окна --> */}
             {title}
-            {/* <!-- Основное содержимое модального окна --> */}
+
+          {isBody &&
             <div className = "modal-body">
             <form
               onSubmit = {this.onSubmit}
@@ -89,10 +92,13 @@ export default class Modal extends Component {
                 className = "form-control"
                 onChange = {this.onValueChange}
                 value = {value}
+                autoFocus = {inputFocus}
+                readOnly = {inputReadOnly}
               />
             </form>
             </div>
-            {/* <!-- Футер модального окна --> */}
+          }    
+          {isFooter &&
             <div className = "modal-footer">
               <button
                 type = "button"
@@ -110,6 +116,7 @@ export default class Modal extends Component {
                   {actionTitle}
                 </button>
             </div>
+          }
           </div>
         </div>
       </div>,

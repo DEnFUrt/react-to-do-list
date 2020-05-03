@@ -1,5 +1,3 @@
-//import CheckData from '../check-data';
-
 export default class FetchData {
   constructor(property) {
     this.userID = property.userID;
@@ -17,14 +15,11 @@ export default class FetchData {
           patch = 'https://my-json-server.typicode.com/DEnFUrt/json-repo/dirtyData';
         break;
       case 'getUser':
-          patch = 'https://api.jsonbin.io/b/5ea583bc2940c704e1dee18d/latest';
+          patch = 'https://api.jsonbin.io/b/5ea9ad6607d49135ba47c725/latest';
         break;
       case 'putUser':
-          patch = 'https://api.jsonbin.io/b/5ea583bc2940c704e1dee18d';
+          patch = 'https://api.jsonbin.io/b/5ea9ad6607d49135ba47c725';
         break;
-      // case 'delData':
-      //     patch = `https://api.jsonbin.io/b/${this.userID}`;
-      //   break;
       case 'getData':
           patch = `https://api.jsonbin.io/b/${this.userID}/latest`;
         break;
@@ -42,6 +37,60 @@ export default class FetchData {
   }
 
   async getFetchData() {
+    return
+    const response = await fetch(this.patch);
+    return await response.json();
+  }
+
+  async putFetchData(data, flag) {
+    return
+    let putData = {};
+    switch (flag) {
+      case 'user':
+        putData = {users : data};
+        break;
+      case 'data':
+        putData = {dirtyData : data};
+        break;
+      default:
+        break;
+    }
+
+    const response = await fetch(this.patch, {
+      method: 'PUT',
+      body:  JSON.stringify(putData),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8"
+      }
+    });
+    return await response.json();
+  } 
+
+  async delFetchData() {
+    const response = await fetch(this.patch, {
+      method: 'DELETE',
+      headers: {
+        "secret-key": "$2b$10$iojraRjHeoC7ojk.sT.pO.eK3HGAwvhoIC0SWZG5PxK24I471qAhC"
+      }
+    });
+    return await response.json();
+  }
+
+  async postFetchData() {
+    const response = await fetch(this.patch, {
+        method: 'POST',
+        body:  JSON.stringify({dirtyData : []}),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          "secret-key": "$2b$10$iojraRjHeoC7ojk.sT.pO.eK3HGAwvhoIC0SWZG5PxK24I471qAhC",
+          "private": false
+        }
+      });
+      return await response.json();
+  }
+
+  /* async getFetchData() {
+    return
     console.log(this.patch);
     let result;
     try {
@@ -54,12 +103,23 @@ export default class FetchData {
       console.log(error.message);
     }
     return result;
-  }
+  } */
 
-  async putFetchData(data) {
-    return
+
+  /* async putFetchData(data, flag) {
+    // return
     let result;
-    const putData = {dirtyData : data};
+    let putData = {};
+    switch (flag) {
+      case 'user':
+        putData = {users : data};
+        break;
+      case 'data':
+        putData = {dirtyData : data};
+        break;
+      default:
+        break;
+    }
     console.log('!!!!START PUT FETCH!!!!')
     try {
       //let response = await fetch('https://api.jsonbin.io/b/5e95fa4f435f5604bb41556e', {
@@ -75,15 +135,18 @@ export default class FetchData {
       console.error('Ошибка отправки данных на сервер: ', error.message);
     }
     return result;
-  } 
+  }  */
 
-  async delFetchData() {
+  /* async delFetchData() {
     console.log('!!!!START DEL FETCH!!!!')
     console.log(this.patch);
     let result;
     try {
       let response = await fetch(this.patch, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: {
+          "secret-key": "$2b$10$iojraRjHeoC7ojk.sT.pO.eK3HGAwvhoIC0SWZG5PxK24I471qAhC"
+        }
       });
       result = await response.json();
     } catch(error) {
@@ -91,4 +154,26 @@ export default class FetchData {
     }
     return result;
   }
+ */
+
+/*   async postFetchData() {
+    console.log('!!!!START POST FETCH!!!!')
+    console.log(this.patch);
+    let result;
+    try {
+      let response = await fetch(this.patch, {
+        method: 'POST',
+        body:  JSON.stringify({dirtyData : []}),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+          "secret-key": "$2b$10$iojraRjHeoC7ojk.sT.pO.eK3HGAwvhoIC0SWZG5PxK24I471qAhC",
+          "private": false
+        }
+      });
+      result = await response.json();
+    } catch(error) {
+      console.error('Ошибка создания базы данных на сервере: ', error.message);
+    }
+    return result;
+  } */
 }

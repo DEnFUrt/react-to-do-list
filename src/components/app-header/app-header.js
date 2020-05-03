@@ -7,8 +7,8 @@ export default class AppHeader extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      //value : '',
-      userID : '',
+        userID : '',
+        name: ''
     }
 
     this.onValueChange = this.onValueChange.bind(this);
@@ -21,10 +21,10 @@ export default class AppHeader extends Component {
 
   onValueChange(e) {
     const select = e.target;
-
+  
     this.setState({
-      //value : select.value,
-      userID : select[select.selectedIndex].value
+      userID : select.value,
+      name: select[select.selectedIndex].textContent
     }, () => this.props.onChangeUser(this.state.userID));
   }
 
@@ -38,23 +38,31 @@ export default class AppHeader extends Component {
       const newOption = new Option(element.name, element.userID);
       select.append(newOption);
     });
+
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.listUsers !== prevProps.listUsers) {
-      this.addSelectOptions(this.props.listUsers);
-      console.log('this.props.listUsers: ', this.props.listUsers);
+    const {listUsers, userID : propsUserID} = this.props;
+    if (listUsers !== prevProps.listUsers) {
+      this.addSelectOptions(listUsers);
+
+      const options = [...document.querySelector('#exampleSelect').options];
+      const name = options.filter(option => option.value === propsUserID)[0].textContent;
+      console.log('name!!!!!!!!!!!!!!!!: ', name);
+      this.setState(
+        state => state.userID !== propsUserID ?
+          {userID : propsUserID, name: name} : null,
+        () => {
+          console.log('Header this.props.listUsers: ', this.props.listUsers);
+          console.log('Header this.state: ', this.state);
+        }
+      )
     }
   }
 
-  componentDidMount() {
-    //this.onGetUsers();
-    
-  }
-
   render() {
-    const {liked, allPosts, onAddUser, onDelUser} = this.props;
-    //const {userID, value} = this.state;
+    const {liked, allPosts, onUser} = this.props;
+    const {userID, name} = this.state;
     return (
       <div className = "app-header d-flex">
         <form
@@ -66,7 +74,7 @@ export default class AppHeader extends Component {
               <select
                 className = "custom-select mr-sm-2" 
                 id = "exampleSelect"
-                //value = {value}
+                value = {userID}
                 onChange = {this.onValueChange}
               >
                 <option style = {{display: "none"}}></option>
@@ -74,18 +82,20 @@ export default class AppHeader extends Component {
             </div>
             <div className = "col-auto my-1">  
               <button
+                id = "btnAdd"
                 type = "button"
                 className = "btn btn-outline-secondary"
-                onClick = {() => onAddUser()}
+                onClick = {(e) => onUser({e})}
               >
                 Добавить
               </button>
             </div>
             <div className = "col-auto my-1"> 
               <button
+                id = "btnDel"
                 type = "button"
                 className = "btn btn-outline-secondary"
-                onClick = {() => onDelUser()}
+                onClick = {(e) => onUser({e, name})}
               >
                 Удалить
               </button>
