@@ -12,7 +12,8 @@ export default class Modal extends Component {
     }
     
     this.elemModal = document.createElement('div');
-    
+    this.textInput = React.createRef();
+
     this.onValueChange = this.onValueChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
@@ -24,17 +25,30 @@ export default class Modal extends Component {
     onAction(this.state);
   }
 
+  focusTextInput() {
+    if (this.textInput.current) {
+      this.textInput.current.focus();
+    };
+  }
+
   createModal() {
     const {isModal} = this.props;
-    const {modalTitle, onClose} = this.props.propsModal;
+
     const modalClass = isModal ? "modal fade show" : "modal fade";
     const modalStyles = isModal ? {display: "block"} : {};
+    
+    return {modalClass, modalStyles};
+  }
+
+  createModalTitle() {
+    const {modalTitle, onClose} = this.props.propsModal;
+    
     const title = modalTitle ? (
       <div className="modal-header">
         <h5 className="modal-title">{modalTitle}</h5>
         <button 
           type="button" 
-          className="close" 
+          className="close custom-close" 
           data-dismiss="modal"
           onClick = {() => onClose(false)}
           aria-hidden="true">
@@ -42,7 +56,64 @@ export default class Modal extends Component {
           </button>
       </div>
     ) : null;
-    return {modalClass, modalStyles, title};
+
+    return {title};
+  }
+
+  createModalBody() {
+    const {value} = this.state;
+    const {isBody, inputReadOnly} = this.props.propsModal;
+
+    const body = isBody ? (
+      <div className = "modal-body">
+      <form
+        onSubmit = {this.onSubmit}
+      >
+        <input
+          id = "inputModal"
+          type = "text"
+          ref = {this.textInput}
+          className = "form-control"
+          onChange = {this.onValueChange}
+          value = {value}
+          tabIndex = "1"
+          readOnly = {inputReadOnly}
+        />
+      </form>
+      </div>
+    ) : null;
+
+    return {body};
+  }
+
+  createModalFooter() {
+    const {isFooter, cancelTitle, actionTitle, onClose} = this.props.propsModal;
+
+    const footer = isFooter ? (
+      <div className = "modal-footer">
+        <button
+          id = "btnClose"
+          type = "button"
+          tabIndex = "3"
+          className = "btn btn-default"
+          data-dismiss = "modal"
+          onClick = {() => onClose(false)}
+          >
+            {cancelTitle}
+          </button>
+        <button
+          id = "btnAction"
+          type = "button"
+          tabIndex = "2"
+          className = "btn btn-primary"
+          onClick = {this.onSubmit}
+          >
+            {actionTitle}
+          </button>
+      </div>
+    ) : null;
+
+    return {footer};
   }
 
   onValueChange(e) {
@@ -54,11 +125,15 @@ export default class Modal extends Component {
     this.elemModal.className = 'overlay';
     this.elemModal.style.display = 'block';
     document.body.append(this.elemModal);
+    
     const {isValue = '', isId = ''} = this.props.propsModal;
+    
     this.setState({
       value : isValue,
       id : isId
     });
+
+    this.focusTextInput();
   }
 
   componentWillUnmount() {
@@ -67,10 +142,10 @@ export default class Modal extends Component {
   }
 
   render() {
-    const {value} = this.state;
-    const {isBody, isFooter, cancelTitle, actionTitle, onClose} = this.props.propsModal;
-    const {inputReadOnly, inputFocus} = this.props.propsModal;
-    const {modalClass, modalStyles, title} = this.createModal();
+    const {modalClass, modalStyles} = this.createModal();
+    const {title} = this.createModalTitle();
+    const {body} = this.createModalBody();
+    const {footer} = this.createModalFooter();
 
     return ReactDOM.createPortal(
       <div 
@@ -81,42 +156,8 @@ export default class Modal extends Component {
         <div className = "modal-dialog modal-lg modal-dialog-centered">
           <div className = "modal-content">
             {title}
-
-          {isBody &&
-            <div className = "modal-body">
-            <form
-              onSubmit = {this.onSubmit}
-            >
-              <input
-                type = "text"
-                className = "form-control"
-                onChange = {this.onValueChange}
-                value = {value}
-                autoFocus = {inputFocus}
-                readOnly = {inputReadOnly}
-              />
-            </form>
-            </div>
-          }    
-          {isFooter &&
-            <div className = "modal-footer">
-              <button
-                type = "button"
-                className = "btn btn-default"
-                data-dismiss = "modal"
-                onClick = {() => onClose(false)}
-                >
-                  {cancelTitle}
-                </button>
-              <button
-                type = "button"
-                className = "btn btn-primary"
-                onClick = {this.onSubmit}
-                >
-                  {actionTitle}
-                </button>
-            </div>
-          }
+            {body}
+            {footer}
           </div>
         </div>
       </div>,

@@ -15,8 +15,6 @@ export default class App extends Component {
   listKeyObjData = ['label', 'important', 'like', 'dateStamp', 'edit'];
   listKeyObjUser = ['name', 'pass', 'userID'];
   modalOptions = {};
-  //tempLabel = '';
-  //tempId = '';
 
   constructor(props) {
     super(props);
@@ -54,10 +52,10 @@ export default class App extends Component {
           listUsers ? this.setState(
               state => state.listUsers = listUsers
             ) : 
-            alert('Ошибка обработки списка пользователей');
+            this.onAlertModal('Ошибка обработки списка пользователей');
         })
       .catch(
-        error => alert(`Ошибка получения списка пользователей - ${error.message}`)
+        error => this.onAlertModal(`Ошибка получения списка пользователей - ${error.message}`)
       )
   }
   
@@ -71,7 +69,7 @@ export default class App extends Component {
       }
     )
     .catch(
-      error => alert(`Ошибка обновления данных - ${error.message}`)
+      error => this.onAlertModal(`Ошибка обновления данных - ${error.message}`)
     )
     .finally(
       () => this.onGetUsers()
@@ -115,7 +113,7 @@ export default class App extends Component {
       }
     )
     .catch(
-      error => alert(`Ошибка добавления пользователя - ${error.message}`)
+      error => this.onAlertModal(`Ошибка добавления пользователя - ${error.message}`)
     )
   }
 
@@ -123,7 +121,7 @@ export default class App extends Component {
     //Получить id юзера из state +
     //Удалить запись из базы users +
     //Удалить data по id юзера +
-    //вернуть сообщение в модальном окне что юзер удален 
+    //вернуть сообщение в модальном окне что юзер удален +
     console.log('DELLLLLLL')
     this.onToggleModal(false);
     const {userID, listUsers} = this.state;
@@ -140,12 +138,12 @@ export default class App extends Component {
             const newListUsers = listUsers.filter(item => item.userID !== userID);
             this.onPutUsers(newListUsers);
             this.onGetData();
-            alert('Пользователь удален');
+            this.onAlertModal('Пользователь удален!');
           }
         }
       )
       .catch(
-        error => alert(`Ошибка удаления пользователя - ${error.message}`)
+        error => this.onAlertModal(`Ошибка удаления пользователя - ${error.message}`)
       )
   }
 
@@ -166,7 +164,7 @@ export default class App extends Component {
         }
       )
       .catch(
-        error => alert(`Ошибка получения данных - ${error.message}`)
+        error => this.onAlertModal(`Ошибка получения данных - ${error.message}`)
       )
   }
 
@@ -179,7 +177,7 @@ export default class App extends Component {
         }
       )
       .catch(
-        error => alert(`Ошибка обновления данных - ${error.message}`)
+        error => this.onAlertModal(`Ошибка обновления данных - ${error.message}`)
       )
       .finally(
         () => this.onGetData(userID)
@@ -312,7 +310,6 @@ export default class App extends Component {
         onAction: this.editItem,
         isBody: true,
         isFooter: true,
-        inputFocus: true,
       });
       console.log(this.modalOptions);
     } 
@@ -328,7 +325,6 @@ export default class App extends Component {
         onAction: this.onAddUser,
         isBody: true,
         isFooter: true,
-        inputFocus: true,
       });
       console.log(this.modalOptions);
     } else if (target.tagName === 'BUTTON' && target.id === 'btnDel') {
@@ -347,6 +343,16 @@ export default class App extends Component {
       console.log(this.modalOptions);
     }
 
+    this.onToggleModal(true);
+  }
+
+  onAlertModal(message) {
+    this.modalOptions = new ModalOptions({
+      modalTitle: message,
+      onClose: this.onToggleModal,
+    });
+    console.log(this.modalOptions);
+    
     this.onToggleModal(true);
   }
 
@@ -403,11 +409,6 @@ export default class App extends Component {
           <Modal 
             propsModal = {this.modalOptions}
             isModal = {this.state.isModal}
-            // isTitle = {this.titleModal.edit}
-            // isValue = {this.tempLabel}
-            // isId = {this.tempId}
-            // onClose = {this.onToggleModal}
-            // onAction = {this.editItem}
           >
           </Modal>
         }

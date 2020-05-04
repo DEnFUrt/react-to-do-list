@@ -37,7 +37,6 @@ class ModalOptions {
     this.isId = property.isId || ''; //Служебный параметр для стейта модального окна
     this.isBody = property.isBody; //Видимость элемента body модального окна
     this.isFooter = property.isFooter; //Видимость элемента body модального окна
-    this.inputFocus = property.inputFocus; //Автофокус элемента Input модального окна
     this.inputReadOnly = property.inputReadOnly; //Запрет редактирования элемента Input модального окна
   }
 }

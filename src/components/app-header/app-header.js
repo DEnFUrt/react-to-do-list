@@ -11,6 +11,7 @@ export default class AppHeader extends Component {
         name: ''
     }
 
+    this.select = React.createRef();
     this.onValueChange = this.onValueChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
@@ -29,7 +30,7 @@ export default class AppHeader extends Component {
   }
 
   addSelectOptions(listUsers) {
-    const select =  document.getElementById('exampleSelect');
+    const select = this.select.current;
     while (select.options.length > 1) {
       select.options[select.options.length - 1].remove();
     }
@@ -46,9 +47,9 @@ export default class AppHeader extends Component {
     if (listUsers !== prevProps.listUsers) {
       this.addSelectOptions(listUsers);
 
-      const options = [...document.querySelector('#exampleSelect').options];
+      const options = [...this.select.current.options];
       const name = options.filter(option => option.value === propsUserID)[0].textContent;
-      console.log('name!!!!!!!!!!!!!!!!: ', name);
+
       this.setState(
         state => state.userID !== propsUserID ?
           {userID : propsUserID, name: name} : null,
@@ -74,6 +75,7 @@ export default class AppHeader extends Component {
               <select
                 className = "custom-select mr-sm-2" 
                 id = "exampleSelect"
+                ref = {this.select}
                 value = {userID}
                 onChange = {this.onValueChange}
               >

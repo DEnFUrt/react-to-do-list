@@ -17,3 +17,8 @@
       -ms-transform: translateX(-50%);
           transform: translateX(-50%);
 }
+
+button.custom-close {
+  outline: none;
+  top: -3px;
+}
