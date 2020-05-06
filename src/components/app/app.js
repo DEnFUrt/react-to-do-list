@@ -8,6 +8,7 @@ import Modal from '../modal';
 import CheckData from '../check-data';
 import FetchData from '../fetch-data';
 import {addId, setDateStapm, ModalOptions} from '../data-utils';
+import Spinner from '../spinner';
 
 import './app.css';
 
@@ -27,6 +28,7 @@ export default class App extends Component {
       listUsers : {},
     }
 
+    this.spinner = React.createRef();
     this.deleteItem = this.deleteItem.bind(this);
     this.addItem = this.addItem.bind(this);
     this.onToggleImportant = this.onToggleImportant.bind(this);
@@ -44,7 +46,10 @@ export default class App extends Component {
   /* Блок методов для учетных записей пользователей */
 
   onGetUsers() {
+    this.spinner.current.onToggleShow();
+    
     const getUsers = new FetchData({userID: '', type: 'getUser'});
+  
     getUsers.getFetchData()
       .then(
         result => {
@@ -57,15 +62,20 @@ export default class App extends Component {
       .catch(
         error => this.onAlertModal(`Ошибка получения списка пользователей - ${error.message}`)
       )
+      .finally(
+        () => this.spinner.current.onToggleHide()
+      )
   }
   
   onPutUsers(newListUsers, userID = '') {
     const putUsers = new FetchData({userID: '', type: 'putUser'});
+    
     putUsers.putFetchData(newListUsers, 'user')
     .then(
       result => {
-        console.log('Результат отправки данных на сервер: ', result);
-        this.onChangeUser(userID);
+        if (result.success) {
+          this.onChangeUser(userID);
+        }
       }
     )
     .catch(
@@ -77,35 +87,38 @@ export default class App extends Component {
   }
 
   onAddUser({value}) {
-    //Получить имя юзера через модальное окно +
-    //Создать под него пустую date +
-    //Получить обратно id date +
-    //Создать запись в базе users +
-    //Обновить список users +
-    //установить селект на нового юзера +
-    //Добавить прогрессбар на время загрузки данных
-    console.log('ADDDDDDDDD')
-    this.onToggleModal(false);
-    const newUser = value;
+    /* 
+    Получить имя юзера через модальное окно +
+    Создать под него пустую date +
+    Получить обратно id date +
+    Создать запись в базе users +
+    Обновить список users +
+    установить селект на нового юзера + 
+    */
 
+    this.onToggleModal(false);
+    
+    const newUser = value;
+    
     if (newUser === null || newUser.length < 5) {
       return
     }
-
+    
+    this.spinner.current.onToggleShow();
+    
     const {listUsers} = this.state;
     const addData = new FetchData({userID: '', type: 'postData'});
+    
     addData.postFetchData()
     .then(
       result => {
         if (result.success) {
-          console.log('Получен userID: ', result.id);
           const userID = result.id;
           const newItemUser = {
             name : newUser,
             pass : '123456',
             userID : userID,
           }
-          console.log('newItemUser: ', newItemUser);
           const newListUsers = [...listUsers, newItemUser];
           
           this.onPutUsers(newListUsers, userID)
@@ -113,24 +126,33 @@ export default class App extends Component {
       }
     )
     .catch(
-      error => this.onAlertModal(`Ошибка добавления пользователя - ${error.message}`)
+      error => {
+        this.spinner.current.onToggleHide()
+        this.onAlertModal(`Ошибка добавления пользователя - ${error.message}`)
+      }
     )
   }
 
   onDelUser() {
-    //Получить id юзера из state +
-    //Удалить запись из базы users +
-    //Удалить data по id юзера +
-    //вернуть сообщение в модальном окне что юзер удален +
-    console.log('DELLLLLLL')
-    this.onToggleModal(false);
-    const {userID, listUsers} = this.state;
+    /*
+    Получить id юзера из state +
+    Удалить запись из базы users +
+    Удалить data по id юзера +
+    вернуть сообщение в модальном окне что юзер удален +
+    */
 
+    this.onToggleModal(false);
+    
+    const {userID, listUsers} = this.state;
+    
     if (!userID) {
       return;
     }
-
+    
+    this.spinner.current.onToggleShow();
+    
     const delData = new FetchData({userID, type: 'delData'});
+    
     delData.delFetchData()
       .then(
         result => {
@@ -145,6 +167,9 @@ export default class App extends Component {
       .catch(
         error => this.onAlertModal(`Ошибка удаления пользователя - ${error.message}`)
       )
+      .finally(
+        () => this.spinner.current.onToggleHide()
+      )
   }
 
   /* Блок методов для работы с данными на сервере*/
@@ -154,7 +179,11 @@ export default class App extends Component {
       this.setState(({data}) => ({data : []}));
       return
     }
+    
+    this.spinner.current.onToggleShow();
+    
     const getData = new FetchData({userID, type: 'getData'});
+    
     getData.getFetchData()
       .then(
         result => {
@@ -166,10 +195,16 @@ export default class App extends Component {
       .catch(
         error => this.onAlertModal(`Ошибка получения данных - ${error.message}`)
       )
+      .finally(
+        () => this.spinner.current.onToggleHide()
+      )
   }
 
   onPutData(userID, data) {
-    const putData = new FetchData({userID, type: 'putData' /* 'getDataTest' */});
+    this.spinner.current.onToggleShow();
+    
+    const putData = new FetchData({userID, type: 'putData'});
+    
     putData.putFetchData(data, 'data')
       .then(
         result => {
@@ -203,6 +238,7 @@ export default class App extends Component {
     
   editItem({id, value}) {
     this.onToggleModal(false);
+    
     const {data, userID} = this.state;
     const index = data.findIndex(item => item.id === id);
     const oldItem = data[index];
@@ -260,7 +296,6 @@ export default class App extends Component {
   }
 
   onChangeUser(userID) {
-    console.log('ChangeUser', userID)
     this.setState(
       state => state.userID !== userID ? {userID} : null
     );
@@ -295,7 +330,8 @@ export default class App extends Component {
   /* Блок методов для модального окна */
 
   onOpenModal({e, id, name}) {
-    const target =  e.nativeEvent.target;
+    const target = e.nativeEvent.target;
+    
     if (target.tagName === 'SPAN') {
       const {data} = this.state;
       const oldItem = data.find(item => item.id === id);
@@ -311,12 +347,9 @@ export default class App extends Component {
         isBody: true,
         isFooter: true,
       });
-      console.log(this.modalOptions);
     } 
     
     if (target.tagName === 'BUTTON' && target.id === 'btnAdd') {
-      console.log('add', target.id);
-      
       this.modalOptions = new ModalOptions({
         modalTitle: 'Добавить пользователя',
         cancelTitle: 'Закрыть',
@@ -326,9 +359,7 @@ export default class App extends Component {
         isBody: true,
         isFooter: true,
       });
-      console.log(this.modalOptions);
     } else if (target.tagName === 'BUTTON' && target.id === 'btnDel') {
-      console.log('del', target.id);
       this.modalOptions = new ModalOptions({
         modalTitle: 'Удалить пользователя',
         cancelTitle: 'Закрыть',
@@ -340,7 +371,6 @@ export default class App extends Component {
         isFooter: true,
         inputReadOnly: true,
       });
-      console.log(this.modalOptions);
     }
 
     this.onToggleModal(true);
@@ -351,7 +381,6 @@ export default class App extends Component {
       modalTitle: message,
       onClose: this.onToggleModal,
     });
-    console.log(this.modalOptions);
     
     this.onToggleModal(true);
   }
@@ -364,9 +393,8 @@ export default class App extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.userID !== prevState.userID) {
-      console.log('Update App State', this.state)
       this.onGetData(this.state.userID);
-    } else {console.log('App NULL')}
+    }
   }
 
   componentDidMount() {
@@ -412,6 +440,7 @@ export default class App extends Component {
           >
           </Modal>
         }
+        {<Spinner ref = {this.spinner} />}
       </div>
     )
   }

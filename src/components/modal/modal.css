@@ -8,11 +8,6 @@
   z-index: 3;
 }
 .overlay .popup {
-  /* position: fixed;
-  z-index: 4;
-  left: 50%;
-  top: 150px;
-  width: 752px; */
   -webkit-transform: translateX(-50%);
       -ms-transform: translateX(-50%);
           transform: translateX(-50%);

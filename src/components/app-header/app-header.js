@@ -52,11 +52,7 @@ export default class AppHeader extends Component {
 
       this.setState(
         state => state.userID !== propsUserID ?
-          {userID : propsUserID, name: name} : null,
-        () => {
-          console.log('Header this.props.listUsers: ', this.props.listUsers);
-          console.log('Header this.state: ', this.state);
-        }
+          {userID : propsUserID, name: name} : null
       )
     }
   }

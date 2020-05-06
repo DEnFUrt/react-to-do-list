@@ -8,12 +8,6 @@ export default class FetchData {
   _setPatch() {
     let patch = '';
     switch (this.type) {
-      case 'getUserTest':
-          patch = 'https://my-json-server.typicode.com/DEnFUrt/json-repo/users';
-        break;
-      case 'getDataTest':
-          patch = 'https://my-json-server.typicode.com/DEnFUrt/json-repo/dirtyData';
-        break;
       case 'getUser':
           patch = 'https://api.jsonbin.io/b/5ea9ad6607d49135ba47c725/latest';
         break;
@@ -37,13 +31,13 @@ export default class FetchData {
   }
 
   async getFetchData() {
-    return
+      // return
     const response = await fetch(this.patch);
     return await response.json();
   }
 
   async putFetchData(data, flag) {
-    return
+      // return
     let putData = {};
     switch (flag) {
       case 'user':

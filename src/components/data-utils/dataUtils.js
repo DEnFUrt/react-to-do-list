@@ -25,7 +25,6 @@ function setDateStapm() {
   return `${addZero(dateStamp.getDate())}.${addZero(dateStamp.getMonth() + 1)}.${dateStamp.getFullYear()} ${addZero(dateStamp.getHours())}:${addZero(dateStamp.getMinutes())}`;
 }
 
-
 class ModalOptions {
   constructor(property) {
     this.modalTitle = property.modalTitle || null; //Заголовок модального окна
@@ -36,7 +35,7 @@ class ModalOptions {
     this.isValue = property.isValue || ''; //Строка передаваемая в input модального окна
     this.isId = property.isId || ''; //Служебный параметр для стейта модального окна
     this.isBody = property.isBody; //Видимость элемента body модального окна
-    this.isFooter = property.isFooter; //Видимость элемента body модального окна
+    this.isFooter = property.isFooter; //Видимость элемента footer модального окна
     this.inputReadOnly = property.inputReadOnly; //Запрет редактирования элемента Input модального окна
   }
 }

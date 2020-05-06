@@ -66,20 +66,20 @@ export default class Modal extends Component {
 
     const body = isBody ? (
       <div className = "modal-body">
-      <form
-        onSubmit = {this.onSubmit}
-      >
-        <input
-          id = "inputModal"
-          type = "text"
-          ref = {this.textInput}
-          className = "form-control"
-          onChange = {this.onValueChange}
-          value = {value}
-          tabIndex = "1"
-          readOnly = {inputReadOnly}
-        />
-      </form>
+        <form
+          onSubmit = {this.onSubmit}
+        >
+          <input
+            id = "inputModal"
+            type = "text"
+            ref = {this.textInput}
+            className = "form-control"
+            onChange = {this.onValueChange}
+            value = {value}
+            tabIndex = "1"
+            readOnly = {inputReadOnly}
+          />
+        </form>
       </div>
     ) : null;
 
