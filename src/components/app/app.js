@@ -296,9 +296,15 @@ export default class App extends Component {
   }
 
   onChangeUser(userID) {
+    /*
+    Изменить userID в state +
+    Записать в localStorage активного пользователя + 
+    */
     this.setState(
-      state => state.userID !== userID ? {userID} : null
+      state => state.userID !== userID ? {userID} : null,
+      () => localStorage.setItem('userID', this.state.userID)
     );
+    
   }
 
   countLiked({data}) {
@@ -398,7 +404,18 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    /* 
+    Получить список пользователей с сервера
+    Получить сохраненного пользователя из localStorage
+    Установить этого пользователя активным 
+    */
     this.onGetUsers();
+
+    const storUserID = localStorage.getItem('userID');
+
+    if (storUserID) {
+      this.onChangeUser(storUserID);
+    } 
   }
 
   render() {
