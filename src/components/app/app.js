@@ -335,7 +335,7 @@ export default class App extends Component {
 
   /* Блок методов для модального окна */
 
-  onOpenModal({e, id, name}) {
+  onOpenModal({e, id, userName}) {
     const target = e.nativeEvent.target;
     
     if (target.tagName === 'SPAN') {
@@ -370,7 +370,7 @@ export default class App extends Component {
         modalTitle: 'Удалить пользователя',
         cancelTitle: 'Закрыть',
         actionTitle: 'Удалить',
-        isValue: name,
+        isValue: userName,
         onClose: this.onToggleModal,
         onAction: this.onDelUser,
         isBody: true,

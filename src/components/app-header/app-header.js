@@ -8,7 +8,7 @@ export default class AppHeader extends Component {
     super(props);
     this.state = {
         userID : '',
-        name: ''
+        userName: ''
     }
 
     this.select = React.createRef();
@@ -25,7 +25,7 @@ export default class AppHeader extends Component {
   
     this.setState({
       userID : select.value,
-      name: select[select.selectedIndex].textContent
+      userName: select[select.selectedIndex].textContent
     }, () => this.props.onChangeUser(this.state.userID));
   }
 
@@ -52,14 +52,14 @@ export default class AppHeader extends Component {
 
       this.setState(
         state => state.userID !== propsUserID ?
-          {userID : propsUserID, name: name} : null
+          {userID : propsUserID, userName: name} : null
       )
     }
   }
 
   render() {
     const {liked, allPosts, onUser} = this.props;
-    const {userID, name} = this.state;
+    const {userID, userName} = this.state;
     return (
       <div className = "app-header d-flex">
         <form
@@ -93,7 +93,7 @@ export default class AppHeader extends Component {
                 id = "btnDel"
                 type = "button"
                 className = "btn btn-outline-secondary"
-                onClick = {(e) => onUser({e, name})}
+                onClick = {(e) => onUser({e, userName})}
               >
                 Удалить
               </button>
